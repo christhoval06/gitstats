@@ -877,7 +877,7 @@ class HTMLReportCreator(ReportCreator):
 		binarypath = os.path.dirname(os.path.abspath(__file__))
 		secondarypath = os.path.join(binarypath, '..', 'share', 'gitstats')
 		basedirs = [binarypath, secondarypath, '/usr/share/gitstats']
-		for file in (conf['style'], 'sortable.js', 'arrow-up.gif', 'arrow-down.gif', 'arrow-none.gif', 'tailwind.json', 'html.py'):
+		for file in (conf['style'], 'arrow-up.gif', 'arrow-down.gif', 'arrow-none.gif'):
 			for base in basedirs:
 				src = base + '/' + file
 				if os.path.exists(src):
@@ -893,23 +893,23 @@ class HTMLReportCreator(ReportCreator):
 		general_html = html.HTML(path=f'{path}/index.html', title=f"{data.projectname}'S STATS", version= getversion())
 
 		general_html.add('<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">')
-		general_html.tilesItemStat(title='Project name', info=data.projectname)
-		general_html.tilesItemStat(title='Generated', info=datetime.datetime.now().strftime(format))
-		general_html.tilesItemStat(title='Report Period', info=f'{data.getFirstCommitDate().strftime(format)} to {data.getLastCommitDate().strftime(format)}')
+		general_html.tilesItemStat(title='Project name', info=data.projectname, icon =html.Icons.Trophy.value.format("w-7 h-7 fill-emerald-500"))
+		general_html.tilesItemStat(title='Generated', info=datetime.datetime.now().strftime(format), icon =html.Icons.CalendarCheck.value.format("w-7 h-7 fill-emerald-500"))
+		general_html.tilesItemStat(title='Report Period', info=f'{data.getFirstCommitDate().strftime(format)} to {data.getLastCommitDate().strftime(format)}', icon =html.Icons.CalendarWeek.value.format("w-7 h-7 fill-emerald-500"))
 		general_html.add('</div>')
 
 		
 		general_html.add('<div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">')
-		general_html.cardItemStat(title='Branches', count=data.total_branches)
-		general_html.cardItemStat(title='Tags', count=data.total_tags)
-		general_html.cardItemStat(title='Age', count=f'{data.getCommitDeltaDays():.1f} days')
-		general_html.cardItemStat(title='Active days', count=f'{len(data.getActiveDays())}', stat=f'{(100.0 * len(data.getActiveDays()) / data.getCommitDeltaDays()):3.2f}%', arrow='up')
-		general_html.cardItemStat(title='Total files', count=data.getTotalFiles())
-		general_html.cardItemStat(title='Total LOC', count=data.getTotalLOC())
-		general_html.cardItemStat(title='Total lines added', count=data.total_lines_added, stat=f'{((data.total_lines_added/data.getTotalLOC())*100):.2f}%', arrow='up')
-		general_html.cardItemStat(title='Total lines removed', count=data.total_lines_removed, stat=f'{((data.total_lines_removed/data.getTotalLOC())*100):.2f}%', arrow='up')
-		general_html.cardItemStat(title='Total commits', count=data.getTotalCommits(), stat=f'{(float(data.getTotalCommits()) / len(data.getActiveDays())):.1f}', arrow='up')
-		general_html.cardItemStat(title='Authors', count=data.getTotalAuthors(), stat=f'{((1.0 * data.getTotalCommits()) / data.getTotalAuthors()):.1f}', arrow='up')
+		general_html.cardItemStat(title='Branches', count=data.total_branches, icon=html.Icons.Branch.value.format('fill-primary dark:fill-white w-5 h-5'))
+		general_html.cardItemStat(title='Tags', count=data.total_tags, icon=html.Icons.Tags.value.format('fill-primary dark:fill-white w-5 h-5'))
+		general_html.cardItemStat(title='Age', count=f'{data.getCommitDeltaDays():.1f} days', icon=html.Icons.Calendar.value.format('fill-primary dark:fill-white w-5 h-5'))
+		general_html.cardItemStat(title='Active days', count=f'{len(data.getActiveDays())}', stat=f'{(100.0 * len(data.getActiveDays()) / data.getCommitDeltaDays()):3.2f}%', arrow='up', icon=html.Icons.CalendarCheck.value.format('fill-primary dark:fill-white w-5 h-5'))
+		general_html.cardItemStat(title='Total files', count=data.getTotalFiles(), icon=html.Icons.File.value.format('fill-primary dark:fill-white w-5 h-5'))
+		general_html.cardItemStat(title='Total LOC', count=data.getTotalLOC(), icon=html.Icons.Code.value.format('fill-primary dark:fill-white w-5 h-5'))
+		general_html.cardItemStat(title='Total lines added', count=data.total_lines_added, stat=f'{((data.total_lines_added/data.getTotalLOC())*100):.2f}%', arrow='up', icon=html.Icons.ArrowTrendUp.value.format('fill-primary dark:fill-white w-5 h-5'))
+		general_html.cardItemStat(title='Total lines removed', count=data.total_lines_removed, stat=f'{((data.total_lines_removed/data.getTotalLOC())*100):.2f}%', arrow='up', icon=html.Icons.ArrowTrendDown.value.format('fill-primary dark:fill-white w-5 h-5'))
+		general_html.cardItemStat(title='Total commits', count=data.getTotalCommits(), stat=f'{(float(data.getTotalCommits()) / len(data.getActiveDays())):.1f}', arrow='up', icon=html.Icons.CodeCommit.value.format('fill-primary dark:fill-white w-5 h-5'))
+		general_html.cardItemStat(title='Authors', count=data.getTotalAuthors(), stat=f'{((1.0 * data.getTotalCommits()) / data.getTotalAuthors()):.1f}', arrow='up', icon=html.Icons.Users.value.format('fill-primary dark:fill-white w-5 h-5'))
 		general_html.add('</div>')
 
 		# general_content.append('<div><div class="card-body"><dl>')
@@ -1125,21 +1125,32 @@ class HTMLReportCreator(ReportCreator):
 		
 
 		# Authors :: List of authors
-		list_authors_content = []
-
-		list_authors_content.append('<div><div class="card-body"><table class="authors sortable" id="authors">')
-		list_authors_content.append('<tr><th>Author</th><th>Commits (%)</th><th>+ lines</th><th>- lines</th><th>First commit</th><th>Last commit</th><th class="unsortable">Age</th><th>Active days</th><th># by commits</th></tr>')
+		list_authors_table_data = []
 		for author in data.getAuthors(conf['max_authors']):
 			info = data.getAuthorInfo(author)
-			list_authors_content.append('<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td></tr>' % (author, info['commits'], info['commits_frac'], info['lines_added'], info['lines_removed'], info['date_first'], info['date_last'], info['timedelta'], len(info['active_days']), info['place_by_commits']))
-		list_authors_content.append('</table></div></div>')
+			list_authors_table_data.append({
+				"author": author,
+				"commits":'%d (<span class="text-sm">%.2f%%</span>)' % (info['commits'], info['commits_frac']),
+				"lines_added": info['lines_added'],
+				"lines_removed": info['lines_removed'],
+				# "date_first": info['date_first'],
+				# "date_last": info['date_last'],
+				# "age": '%s' % info['timedelta'],
+				"active_days": len(info['active_days']),
+				"place_by_commits": info['place_by_commits'],
+			})
 
 		allauthors = data.getAuthors()
 		if len(allauthors) > conf['max_authors']:
 			rest = allauthors[conf['max_authors']:]
-			list_authors_content.append('<p class="moreauthors">These didn\'t make it to the top: %s</p>' % ', '.join(rest))
-		
-		authors_html.addCard(list_authors_content, title='List of Authors')
+			# list_authors_content.append('<p class="moreauthors">These didn\'t make it to the top: %s</p>' % ', '.join(rest))
+			
+		authors_html.addSortableTable(
+			# [('author', 'Author', False, False), ('commits', 'Commits (%)', False, True), ('lines_added', '+ lines', True, False), ('lines_removed', '- lines', True, False), ('date_first', '1st commit', True, False), ('date_last', 'Last commit', True, False), ('age', 'Age', True, False), ('active_days', 'Active days', True, False), ('place_by_commits', '# by commits', False, False)],
+			[('author', 'Author', False, False), ('commits', 'Commits (%)', False, True), ('lines_added', '+ lines', True, False), ('lines_removed', '- lines', True, False), ('active_days', 'Active days', True, False), ('place_by_commits', '# by commits', False, False)],
+			list_authors_table_data,
+			name='authorsListTable',
+			title='List of Authors')
 
 		# Authors :: Commits
 		author_disclaimer = ''
@@ -1269,34 +1280,49 @@ class HTMLReportCreator(ReportCreator):
 
 
 		# Authors :: Author of Month
-		author_of_month_content = []
-		author_of_month_content.append('<table class="sortable" id="aom">')
-		author_of_month_content.append('<tr><th>Month</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>' % conf['authors_top'])
+		author_of_month_table_data = []
 		for yymm in reversed(sorted(data.author_of_month.keys())):
 			authordict = data.author_of_month[yymm]
 			authors = getkeyssortedbyvalues(authordict)
 			authors.reverse()
 			commits = data.author_of_month[yymm][authors[0]]
-			next = ', '.join(authors[1:conf['authors_top']+1])
-			author_of_month_content.append('<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>' % (yymm, authors[0], commits, (100.0 * commits) / data.commits_by_month[yymm], data.commits_by_month[yymm], next, len(authors)))
+			next = '<br/>'.join(authors[1:conf['authors_top']+1])
+			author_of_month_table_data.append({
+				"month": yymm,
+				"author": authors[0],
+				"commits":'%d (<span class="text-sm">%.2f%% of %d</span>)' % (commits, (100.0 * commits) / data.commits_by_month[yymm], data.commits_by_month[yymm]),
+				"next_top": next,
+				"number_of_authors": len(authors),
+			})
 
-		author_of_month_content.append('</table>')
-
-		authors_html.addCard(author_of_month_content, title='Author of Month')
+		authors_html.addSortableTable(
+			[('month', 'Month', False, False), ('author', 'Author', False, False), ('commits', 'Commits (%)', False, True), ('next_top', 'Next top 5', True, True), ('number_of_authors', 'Authors', True, False)],
+			author_of_month_table_data,
+			name='authorOfMonthTable',
+			title='Author of Month')
 
 		# Authors :: Author of Year
-		author_of_year_content = []
-		author_of_year_content.append('<table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>' % conf['authors_top'])
+		author_of_year_table_data = []
 		for yy in reversed(sorted(data.author_of_year.keys())):
 			authordict = data.author_of_year[yy]
 			authors = getkeyssortedbyvalues(authordict)
 			authors.reverse()
 			commits = data.author_of_year[yy][authors[0]]
-			next = ', '.join(authors[1:conf['authors_top']+1])
-			author_of_year_content.append('<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>' % (yy, authors[0], commits, (100.0 * commits) / data.commits_by_year[yy], data.commits_by_year[yy], next, len(authors)))
-		author_of_year_content.append('</table>')
+			next = '<br/>'.join(authors[1:conf['authors_top']+1])
+			
+			author_of_year_table_data.append({
+				"year": yy,
+				"author": authors[0],
+				"commits":'%d (<span class="text-sm">%.2f%% of %d</span>)' % (commits, (100.0 * commits) / data.commits_by_year[yy], data.commits_by_year[yy]),
+				"next_top": next,
+				"number_of_authors": len(authors),
+			})
 
-		authors_html.addCard(author_of_year_content, title='Author of Year', className="xl:col-span-6")
+		authors_html.addSortableTable(
+			[('year', 'Year', False, False), ('author', 'Author', False, False), ('commits', 'Commits (%)', False, True), ('next_top', 'Next top %d' % conf['authors_top'], True, True), ('number_of_authors', 'Authors', True, False)],
+			author_of_year_table_data,
+			name='authorOfYearTable',
+			title='Author of Year')
 
 		# Authors :: Domains
 		domains_by_commits = getkeyssortedbyvaluekey(data.domains, 'commits')
@@ -1379,8 +1405,7 @@ class HTMLReportCreator(ReportCreator):
 
 		# Files :: Extensions
 		files_extensions_series = {"name": 'Extensions', "color": "#3C50E0", "data": []}
-		files_extensions_content = []
-		files_extensions_content.append('<table class="sortable" id="ext"><tr><th>Extension</th><th>Files (%)</th><th>Lines (%)</th><th>Lines/file</th></tr>')
+		files_extensions_table_data = []
 		for ext in sorted(data.extensions.keys()):
 			files = data.extensions[ext]['files']
 			lines = data.extensions[ext]['lines']
@@ -1388,18 +1413,30 @@ class HTMLReportCreator(ReportCreator):
 				loc_percentage = (100.0 * lines) / data.getTotalLOC()
 			except ZeroDivisionError:
 				loc_percentage = 0
-			files_extensions_content.append('<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d (%.2f%%)</td><td>%d</td></tr>' % (ext, files, (100.0 * files) / data.getTotalFiles(), lines, loc_percentage, lines / files))
+
+			files_extensions_table_data.append({
+				"extension": ext,
+				'files': files,
+				'files_percent': f'{((100.0 * files) / data.getTotalFiles()):.2f}',
+				'lines': lines,
+				'lines_percent': f'{loc_percentage:.2f}',
+				'lines_per_file': f'{(lines / files):.2f}',
+
+			})
 			files_extensions_series["data"].append({"x": ext, "y": files})
-		files_extensions_content.append('</table>')
 
 		files_extensions_config = {
 			"chart": {**chart_default_config["chart"], "type": 'treemap'},
 			"series": [files_extensions_series],
 		}
 
-		files_html.addChart(files_extensions_config, name='chartFilesByExtensions', title='Extensions treemap', className="xl:col-span-12")
+		files_html.addSortableTable(
+			[('extension', 'Extension', False, False), ('files', 'Files', False, False), ('files_percent', '% Files', True, False), ('lines', 'Lines', False, False), ('lines_percent', '% Lines', True, False), ('lines_per_file', 'Lines/file', True, False)],
+			files_extensions_table_data,
+			name='filesExtensionsTableData',
+			title='Extensions')
 
-		files_html.addCard(files_extensions_content, title='Extensions', className="xl:col-span-4")
+		files_html.addChart(files_extensions_config, name='chartFilesByExtensions', title='Extensions treemap')
 
 
 		files_html.add('</div>')
@@ -1606,20 +1643,31 @@ class HTMLReportCreator(ReportCreator):
 		tags_html.cardItemStat(title='Average commits per tag', count=f'{(1.0 * data.getTotalCommits() / len(data.tags)):.2f}')
 		tags_html.add('</div>')
 
-		tags_table_content = ['<table class="tags">']
-		tags_table_content.append('<tr><th>Name</th><th>Date</th><th>Commits</th><th>Authors</th></tr>')
+		tags_html.add('<div class="grid grid-cols-12 gap-4 md:gap-6 2xl:gap-7.5">')
+
+		tags_table_data = []
 		# sort the tags by date desc
 		tags_sorted_by_date_desc = [el[1] for el in reversed(sorted([(el[1]['date'], el[0]) for el in list(data.tags.items())]))]
 		for tag in tags_sorted_by_date_desc:
-			authorinfo = []
+			authorinfo = []		
 			self.authors_by_commits = getkeyssortedbyvalues(data.tags[tag]['authors'])
 			for i in reversed(self.authors_by_commits):
-				authorinfo.append('%s (%d)' % (i, data.tags[tag]['authors'][i]))
-			tags_table_content.append('<tr><td>%s</td><td>%s</td><td>%d</td><td>%s</td></tr>' % (tag, data.tags[tag]['date'], data.tags[tag]['commits'], ', '.join(authorinfo)))
-		tags_table_content.append('</table>')
+				authorinfo.append('%s <span class="text-xs">(%d commits)</span>' % (i, data.tags[tag]['authors'][i]))
 
-		tags_html.addCard(tags_table_content, title='Tags information')
+			tags_table_data.append({
+				"name": tag,
+				"date": data.tags[tag]['date'],
+				"commits": data.tags[tag]['commits'],
+				"authors": '<br/>'.join(authorinfo)
+			})
 
+		tags_html.addSortableTable(
+			[('name', 'Name', False, False), ('date', 'Date', False, False), ('commits', 'Commits', False, False), ('authors', 'Authors', True, True)],
+			tags_table_data,
+			name='tagsTnformation',
+			title='Tags information')
+		
+		tags_html.add('</div>')
 		tags_html.create()
 	
 	
@@ -1707,8 +1755,8 @@ class GitStats:
 		if sys.stdin.isatty():
 			print('You may now run:')
 			print()
-			print('   sensible-browser \'%s\'' % os.path.join(outputpath, 'index.html').replace("'", "'\\''"))
-			print('   sensible-notepad \'%s\'' % os.path.join(outputpath, JSONFILE).replace("'", "'\\''"))
+			print('   open \'%s\'' % os.path.join(outputpath, 'index.html').replace("'", "'\\''"))
+			print('   open \'%s\'' % os.path.join(outputpath, JSONFILE).replace("'", "'\\''"))
 			print()
 
 if __name__=='__main__':
