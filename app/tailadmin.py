@@ -237,7 +237,7 @@ class HTML(object):
                     </svg>
                 </span>
                 <span class="text-xl font-bold text-white">
-                    Zinli
+                    Zinli<span class="font-normal">'s Stats</span>
                 </span>
         </a>
         <button

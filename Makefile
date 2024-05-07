@@ -1,7 +1,7 @@
 PREFIX=/usr/local
 BINDIR=$(PREFIX)/bin
 RESOURCEDIR=$(PREFIX)/share/gitstats
-RESOURCES=gitstats.css sortable.js *.gif tailwind.json html.py
+RESOURCES=gitstats.css tailwind.json chart.json
 BINARIES=gitstats
 VERSION=$(shell git describe 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || date +%Y-%m-%d)
 SEDVERSION=perl -pi -e 's/VERSION = 0/VERSION = "$(VERSION)"/' --
@@ -21,6 +21,10 @@ install:
 	install -v $(BINARIES) $(BINDIR)
 	install -v -m 644 $(RESOURCES) $(RESOURCEDIR)
 	$(SEDVERSION) $(BINDIR)/gitstats
+
+unistall:
+	@rm -rf $(RESOURCEDIR)
+	@rm -rf '$(BINDIR)/$(BINARIES)'
 
 release:
 	@cp gitstats gitstats.tmp

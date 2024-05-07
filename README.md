@@ -8,8 +8,5 @@
 
 ## Dependencies
 
-* Gnuplot
-  * MacOS: `brew install gnuplot`
-  * Ubuntu: `sudo apt-get install gnuplot`
 * Git
 * Python >= 3.0
